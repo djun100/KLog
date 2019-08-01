@@ -60,7 +60,7 @@ public final class KLog {
     private static String mGlobalTag;
     private static boolean mIsGlobalTagEmpty = true;
     private static boolean IS_SHOW_LOG = true;
-
+    private static Object[] sObjects = new Object[1];
     public static void init(boolean isShowLog) {
         IS_SHOW_LOG = isShowLog;
     }
@@ -270,7 +270,11 @@ public final class KLog {
     }
 
     private static String[] wrapperContent(int stackTraceIndex, String tagStr, Object... objects) {
-
+        if (objects.length==0){
+            sObjects[0]=tagStr;
+            objects=sObjects;
+            tagStr=TAG_DEFAULT;
+        }
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
         StackTraceElement targetElement = stackTrace[stackTraceIndex];
@@ -300,7 +304,7 @@ public final class KLog {
         }
 
         String msg = (objects == null) ? NULL_TIPS : getObjectsString(objects);
-        String headString = "[ (" + className + ":" + lineNumber + ")#" + methodName + " ] ";
+        String headString = "[ (" + targetElement.getFileName() + ":" + lineNumber + ")#" + methodName + " ] ";
 
         return new String[]{tag, msg, headString};
     }
